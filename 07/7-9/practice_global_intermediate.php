@@ -14,7 +14,7 @@ $computer_rock_scissors_paper = ['グー', 'チョキ', 'パー'];
 $computer_hand_key = array_rand($computer_rock_scissors_paper, 1);
 $computer_hand = $computer_rock_scissors_paper[$computer_hand_key];
 
-// 質問：もう少し短くできないのか？
+// 質問：プレイヤーの勝ちの条件式をもう少し短くできないのか？
 if ( $player_hand === $computer_hand ) {
     // あいこ
     $result = 'Draw';
