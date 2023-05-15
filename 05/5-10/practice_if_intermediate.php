@@ -2,6 +2,7 @@
 <?php
 $now = date('s');
 $repdigit = substr($now, 0, 1) == substr($now, 1, 1);
+// ゾロ目　11で割るとあまりが0ならゾロ目
 
 if ($now ==='00') {
     print 'ジャストタイム!!';
