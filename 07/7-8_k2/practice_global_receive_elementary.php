@@ -15,6 +15,9 @@ if ( isset( $_POST['my_name'] ) === TRUE ) {
 }
 
 // 質問：$my_name !== ''　と　empty($my_name)　とはどう違うのか？　どちらが適切なのか？
+// $my_name !== ''　空欄のみを判定
+// mb_strlen　文字数を数えて0なら　関数　
+// empty($my_name)　https://www.php.net/manual/ja/function.empty.php　で1～8全てをtrue　0などの数字なども。
 // if( isset( $my_name ) === TRUE && $my_name !== '' ) {
 if( isset( $my_name ) === TRUE && !empty($my_name) ) {
     print 'ようこそ' . $my_name . 'さん';

@@ -4,16 +4,22 @@ $my_name = '';
 $gender = '';
 $mail = '';
 
+// 質問：Formで値を受け取るときは毎回htmlspecialchars()を使うのか？　必ず必要なときとは？
+// htmlspecialchars() 画面上に表示するときに使う。取得時に行うと、文字数がかわってしまう
+// DB　SQLに挿入する際に無害化する関数がある
 if (isset($_POST['my_name']) === TRUE) {
     $my_name = htmlspecialchars($_POST['my_name'], ENT_QUOTES, 'UTF-8');
- }
+    var_dump($my_name);
+}
 if (isset($_POST['gender']) === TRUE) {
    $gender = htmlspecialchars($_POST['gender'], ENT_QUOTES, 'UTF-8');
 }
-// 質問：なぜboolean型ではないのか？
+// 質問：inputのvalueはboolean型とString型どちらで行ったほうが良いのか？
+// POSTされてくる値は基本String型
 if (isset($_POST['mail']) === TRUE) {
     $mail = htmlspecialchars($_POST['mail'], ENT_QUOTES, 'UTF-8');
 }
+var_dump($_POST);
 ?>
 
 <!DOCTYPE html>

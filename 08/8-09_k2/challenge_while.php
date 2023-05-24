@@ -4,8 +4,12 @@ $i = 0;
 $result = 0;
 
 while ($result < 1000) {
-    $result = $result + $i;
+    // 1から始める
     $i++;
+    $result = $result + $i;
 }
+// 正解
+// 足される数値45
+// 合計値1035
 print '足される数値' . $i . "<br>" . '合計値' . $result;
 ?>

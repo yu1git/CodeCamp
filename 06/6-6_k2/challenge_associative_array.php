@@ -5,5 +5,7 @@ $fruit = [
     'stock' => 3
 ];
 
+$fruit['price'] = 500;
+
 print $fruit['price'];
 ?>
