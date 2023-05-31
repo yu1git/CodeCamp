@@ -5,6 +5,7 @@ $result = 0;
 
 while ($result < 1000) {
     // 1から始める
+    // $iをそのまま表示するため、$resultを求める前にインクリメントする。
     $i++;
     $result = $result + $i;
 }
