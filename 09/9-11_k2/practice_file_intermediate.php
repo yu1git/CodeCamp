@@ -43,6 +43,11 @@ foreach ($filenames as $filename){
         <tbody>
 <?php foreach ($data as $reads) { ?>
             <tr>
+            <td><?php print $reads[0]; ?></td>
+            <td><?php print $reads[4]; ?></td>
+            <td><?php print $reads[5]; ?></td>
+            <td><?php print $reads[6]; ?></td>
+    <!-- 以下のループより、上のやり方の方が良い -->
     <?php foreach ($reads as $key => $read) {
         if (in_array($key, [0, 4, 5, 6])) {
     ?>

@@ -3,6 +3,8 @@ $filename = './bbs_log.txt';
 $name = '';
 $comment = '';
 
+// 未　バリデーション
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['name']) === TRUE) {
         $name = $_POST['name'];

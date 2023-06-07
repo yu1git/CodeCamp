@@ -14,11 +14,11 @@ if (isset($_POST['coin_time']) === TRUE) {
     for ($i = 0; $i < $time; $i++) {
         $coin_random = mt_rand(0, 1);
         if ($coin_random === 0) {
-            // $coin_back++;
-            $coin_back = ++$coin_back;
+            $coin_back++;
+            // $coin_back = ++$coin_back;
         } else if ($coin_random === 1) {
-            // $coin_front++;
-            $coin_front = ++$coin_front;
+            $coin_front++;
+            // $coin_front = ++$coin_front;
         }
     }
 }

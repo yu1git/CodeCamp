@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     // ファイル書き込み
     if (($fp = fopen($filename, 'a')) !== FALSE) {
+        // 時間　ゾーンを設定してないと日本時間にならないことも
         $log = date('m月d日 H:i:s') . "\t" . $comment . "\n";
         if (fwrite($fp, $log) === FALSE) {
             print 'ファイル書き込み失敗:  ' . $filename;
