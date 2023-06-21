@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['comment']) === TRUE) {
         $comment = $_POST['comment'];
     }
+    
+    // 名前・発言のそれぞれを分けて　if-elseでバリデーションチェックする方がわかりやすい
 
     // 利用者の名前とコメントは必ず文字が入力される。もし名前あるいはコメントが未入力で発言した場合はエラーメッセージを表示し、発言できないようにする。
     if (empty($name) || empty($comment)) {
