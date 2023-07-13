@@ -1,28 +1,41 @@
 <?php
 $goods_data = [];
-$where = '';
-if (isset($_GET['where']) === TRUE) {
-    $where = 'WHERE job = \'' . $_GET['where'] . '\'';
+$job = '';
+if (isset($_GET['job']) === TRUE) {
+    $job = $_GET['job'];
 }
+// XAMPP
+$host = 'localhost';
+$username = 'root';
+$passwd   = '';
+$dbname   = 'codecamp';
+
 // MAMP
-$host = 'localhost'; // データベースのホスト名又はIPアドレス
-$username = 'root';  // MySQLのユーザ名
-$passwd   = 'root';    // MySQLのパスワード
-$dbname   = 'codecamp';    // データベース名
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = 'root';
+// $dbname   = 'codecamp';
+
 $link = mysqli_connect($host, $username, $passwd, $dbname);
 // 接続成功した場合
 if ($link) {
     // 文字化け防止
     mysqli_set_charset($link, 'utf8');
-    $query = 'SELECT * FROM emp_table ' . $where;
-    var_dump($query);
+
+    // 全員の場合はWHEREを記述しないよう分岐する
+    if($job === ''){
+        $query = 'SELECT * FROM emp_table';
+    } else {
+        $query = 'SELECT * FROM emp_table WHERE job = \'' . $job . '\'';
+    }
+
     // クエリを実行します
     $result = mysqli_query($link, $query);
     // 1行ずつ結果を配列で取得します
     while ($row = mysqli_fetch_array($result)) {
         $emp_table[] = $row;
     }
-    // 結果セットを開放します
+    // 結果セットを開放します ※SELECTでデータを取得したときのみ、メモリの開放が必要
     mysqli_free_result($result);
     // 接続を閉じます
     mysqli_close($link);
@@ -48,11 +61,11 @@ if ($link) {
 <body>
     <h1>商品一覧</h1>
     <form>
-            <select name="where">
-                <option value="" <?php if ($where === '') {print 'selected';} ?>>全員</option>
-                <option value="manager" <?php if ($where === 'manager') {print 'selected';} ?>>マネージャー</option>
-                <option value="analyst" <?php if ($where === 'analyst') {print 'selected';} ?>>アナリスト</option>
-                <option value="clerk" <?php if ($where === 'clerk') {print 'selected';} ?>>一般職</option>
+            <select name="job">
+                <option value="" <?php if ($job === '') {print 'selected';} ?>>全員</option>
+                <option value="manager" <?php if ($job === 'manager') {print 'selected';} ?>>マネージャー</option>
+                <option value="analyst" <?php if ($job === 'analyst') {print 'selected';} ?>>アナリスト</option>
+                <option value="clerk" <?php if ($job === 'clerk') {print 'selected';} ?>>一般職</option>
             </select>
         <input type="submit" value="表示">
     </form>
