@@ -16,8 +16,7 @@ $username = 'root';
 $passwd   = 'root';
 $dbname   = 'codecamp';
 
-$link = mysqli_connect($host, $username, $passwd, $dbname);
-// 質問：一度の接続でSELECTとINSERTの療法を行う　or　SELECT後、一度接続を閉じて、formの送信があったときだけ再度DBに接続　　どちらが適切か？
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     if (isset($_POST['name']) === TRUE) {
         $name = $_POST['name'];
@@ -26,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         $price = (int) $_POST['price'];
     }
 
+    // 質問：一度の接続でSELECTとINSERTの療法を行う　or　SELECT後、一度接続を閉じて、formの送信があったときだけ再度DBに接続　　どちらが適切か？
+    $link = mysqli_connect($host, $username, $passwd, $dbname);
     if ($link) {
         // 文字化け防止
         mysqli_set_charset($link, 'utf8');
