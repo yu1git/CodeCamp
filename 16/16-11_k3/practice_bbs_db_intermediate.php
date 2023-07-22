@@ -3,8 +3,8 @@ $bbs_table = [];
 $name = '';
 $comment = '';
 
-$name_error_messages = [];
-$comment_error_messages = [];
+$name_error_messages = '';
+$comment_error_messages = '';
 
 // XAMPP
 // $host = 'localhost';
@@ -18,7 +18,6 @@ $username = 'root';
 $passwd   = 'root';
 $dbname   = 'codecamp';
 
-$link = mysqli_connect($host, $username, $passwd, $dbname);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['name']) === TRUE) {
         $name = $_POST['name'];
@@ -29,49 +28,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // バリデーションチェック
     if (empty($name)) {
-        $name_error_messages[] = '名前は必ず文字を入力してください';
+        $name_error_messages = '名前は必ず文字を入力してください';
     } else if (mb_strlen($name) >= 20) {
-        $name_error_messages[] = '名前は20文字以内で入力してください';
+        $name_error_messages = '名前は20文字以内で入力してください';
     }
     if (empty($comment)) {
-        $comment_error_messages[] = '発言は必ず文字を入力してください';
+        $comment_error_messages = '発言は必ず文字を入力してください';
     } else if (mb_strlen($comment) >= 100) {
-        $comment_error_messages[] = '発言は100文字以内で入力してください';
-    } 
+        $comment_error_messages = '発言は100文字以内で入力してください';
+    }
 
+    $link = mysqli_connect($host, $username, $passwd, $dbname);
     if ((empty($name_error_messages) || empty($comment_error_messages)) && $link) {
         // 文字化け防止
         mysqli_set_charset($link, 'utf8');
 
+        $query = 'INSERT INTO bbs_table(name, comment,create_date) VALUES(\'' . $name . '\',\'' . $comment . '\',\'' . date('Y-m-d H:i:s') . '\')';
 
-
-
-
-
-        // ファイル書き込み
-        $log = $name . "\t" . $comment . "\t" . '発言日時：' . date('m月d日 H:i:s') .  "\n";
-        
-        if (fwrite($fp,$log) === FALSE) {
-            print 'ファイル書き込み失敗:  ' . $filename;
+        // クエリを実行します
+        if (mysqli_query($link, $query) === TRUE) {
+            print '追加成功';
+        } else {
+            print '追加失敗';
         }
-        fclose($fp);
+        // 接続を閉じます
+        mysqli_close($link);
+    // 接続失敗した場合
+    } else {
+        print 'DB接続失敗';
     }
 
 }
 
-$data = [];
+$link = mysqli_connect($host, $username, $passwd, $dbname);
+if ($link) {
+    // 文字化け防止
+    mysqli_set_charset($link, 'utf8');
+    
+    $query = 'SELECT * FROM bbs_table';
 
-if (is_readable($filename) === TRUE) {
-    // ファイル読み込み
-    if (($fp = fopen($filename,'r')) !== FALSE) {
-        while (($tmp = fgets($fp)) !== FALSE) {
-            $data[] = $tmp;
-        }
-        fclose($fp);
+    // クエリを実行します
+    $result = mysqli_query($link, $query);
+    // 1行ずつ結果を配列で取得します
+    while ($row = mysqli_fetch_array($result)) {
+        $bbs_table[] = $row;
     }
-    $data = array_reverse($data);
+    // 結果セットを開放します ※SELECTでデータを取得したときのみ、メモリの開放が必要
+    mysqli_free_result($result);
+
+    // 接続を閉じます
+    mysqli_close($link);
+// 接続失敗した場合
 } else {
-    $data[] = '発言がありません';
+    print '発言がありません';
 }
 ?>
 <!DOCTYPE html>
@@ -93,20 +102,30 @@ if (is_readable($filename) === TRUE) {
             <input type="text" name="name">
         </p>
         <p>名前は20文字以内で入力してください</>
+        <?php if (isset($name_error_messages) && !empty($name_error_messages)) { ?>
+            <p class="error_txt"><?php print $name_error_messages; ?></p>
+        <?php } ?>
         <p>発言(必須)：
             <input type="text" name="comment">
         </p>
         <p>発言は100文字以内で入力してください</p>
-        <?php if (isset($error_messages) && !empty($error_messages)) {
-            foreach ($error_messages as $error_message) { ?>
-            <p class="error_txt"><?php print $error_message; ?></p>
-        <?php }} ?>
+        <?php if (isset($comment_error_messages) && !empty($comment_error_messages)) { ?>
+            <p class="error_txt"><?php print $comment_error_messages; ?></p>
+        <?php } ?>
         <input type="submit" name="submit" value="送信">
     </form>
  
     <p>発言一覧</p>
-<?php foreach ($data as $read) { ?>
-    <p><?php print htmlspecialchars($read, ENT_QUOTES, 'UTF-8'); ?></p>
-<?php } ?>
+<?php if (!empty($bbs_table)) {foreach ($bbs_table as $read) { ?>
+    <p>
+        <?php 
+            print htmlspecialchars($read['name'], ENT_QUOTES, 'UTF-8');
+            print '&nbsp';
+            print htmlspecialchars($read['comment'], ENT_QUOTES, 'UTF-8');
+            print '&nbsp';
+            print htmlspecialchars($read['create_date'], ENT_QUOTES, 'UTF-8');
+         ?>
+    </p>
+<?php }} else {print '発言がありません';} ?>
 </body>
 </html>

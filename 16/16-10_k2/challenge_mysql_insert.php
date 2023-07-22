@@ -37,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         if (mysqli_query($link, $query) === TRUE) {
             $message = '追加成功';
         } else {
-            $message = '追加失敗';
-             
+            $message = '追加失敗';     
         }
         
         // 接続を閉じます
