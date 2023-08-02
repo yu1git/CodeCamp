@@ -5,17 +5,20 @@ $price = '';
 $message = '追加したい商品の名前と価格を入力してください';
 
 // XAMPP
-// $host = 'localhost';
-// $username = 'root';
-// $passwd   = '';
-// $dbname   = 'codecamp';
-
-// MAMP
 $host = 'localhost';
 $username = 'root';
-$passwd   = 'root';
+$passwd   = '';
 $dbname   = 'codecamp';
 
+// MAMP
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = 'root';
+// $dbname   = 'codecamp';
+
+// 質問：一度の接続でSELECTとINSERTの両方を行う　or　SELECT後、一度接続を閉じて、formの送信があったときだけ再度DBに接続　　どちらが適切か？
+// 回答：接続を閉じずに両方の処理をおこなってよい。違うDBに接続する場合は分ける必要がある。
+$link = mysqli_connect($host, $username, $passwd, $dbname);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     if (isset($_POST['name']) === TRUE) {
@@ -25,8 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         $price = (int) $_POST['price'];
     }
 
-    // 質問：一度の接続でSELECTとINSERTの療法を行う　or　SELECT後、一度接続を閉じて、formの送信があったときだけ再度DBに接続　　どちらが適切か？
-    $link = mysqli_connect($host, $username, $passwd, $dbname);
     if ($link) {
         // 文字化け防止
         mysqli_set_charset($link, 'utf8');
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         }
         
         // 接続を閉じます
-        mysqli_close($link);
+        // mysqli_close($link);
     // 接続失敗した場合
     } else {
         $message = 'DB接続失敗';
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 }
 
 // 再接続　※一度接続を閉じたあとは、再接続しないと追加が成功しない
-$link = mysqli_connect($host, $username, $passwd, $dbname);
+// $link = mysqli_connect($host, $username, $passwd, $dbname);
 // 接続成功した場合
 if ($link) {
     // 文字化け防止

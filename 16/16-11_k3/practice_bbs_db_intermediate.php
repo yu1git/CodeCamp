@@ -7,16 +7,18 @@ $name_error_messages = '';
 $comment_error_messages = '';
 
 // XAMPP
-// $host = 'localhost';
-// $username = 'root';
-// $passwd   = '';
-// $dbname   = 'codecamp';
-
-// MAMP
 $host = 'localhost';
 $username = 'root';
-$passwd   = 'root';
+$passwd   = '';
 $dbname   = 'codecamp';
+
+// MAMP
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = 'root';
+// $dbname   = 'codecamp';
+
+$link = mysqli_connect($host, $username, $passwd, $dbname);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['name']) === TRUE) {
@@ -38,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $comment_error_messages = '発言は100文字以内で入力してください';
     }
 
-    $link = mysqli_connect($host, $username, $passwd, $dbname);
+    
     if ((empty($name_error_messages) || empty($comment_error_messages)) && $link) {
         // 文字化け防止
         mysqli_set_charset($link, 'utf8');
@@ -52,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             print '追加失敗';
         }
         // 接続を閉じます
-        mysqli_close($link);
+        // mysqli_close($link);
     // 接続失敗した場合
     } else {
         print 'DB接続失敗';
@@ -60,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 }
 
-$link = mysqli_connect($host, $username, $passwd, $dbname);
+// $link = mysqli_connect($host, $username, $passwd, $dbname);
 if ($link) {
     // 文字化け防止
     mysqli_set_charset($link, 'utf8');
