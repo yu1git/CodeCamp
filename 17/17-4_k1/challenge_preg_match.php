@@ -1,25 +1,24 @@
 <?php
 // 西暦
-$regexp_year   = '/^[0-9]{4}/'; // 西暦の正規表現を入力
+$regexp_year   = '/^[0-9]{4}$/'; // 西暦の正規表現を入力
 $check_year[0] = '1953';
 $check_year[1] = '2013';
 // 電話番号
-$regexp_phone_number   = '/^[0-9]{2,3}-[0-9]{3,4}-[0-9]{3,4}/'; // 電話番号の正規表現を入力
+$regexp_phone_number   = '/^[0-9]{2,4}-[0-9]{3,4}-[0-9]{3,4}$/'; // 電話番号の正規表現を入力
 $check_phone_number[0] = '03-1111-1111';
 $check_phone_number[1] = '040-222-2222';
 $check_phone_number[2] = '0120-000-000';
 // formタグ
-$regexp_form   = '/^<.+?>/'; // formの正規表現を入力
+$regexp_form   = '/^<.+?>$/'; // formの正規表現を入力
 $check_form[0] = '<form>';
 $check_form[1] = '<form method="post">';
 // メールアドレス
-$regexp_mail   = '/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]*.[a-zA-Z0-9]{2,3}.[a-zA-Z0-9]{0,2}/'; // メールアドレスの正規表現を入力
+$regexp_mail   = '/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]*.[a-zA-Z0-9]{2,3}.[a-zA-Z0-9]{0,2}$/'; // メールアドレスの正規表現を入力
 $check_mail[0] = 'test@test.com';
 $check_mail[1] = 'test_2@test.co.jp';
 $check_mail[2] = 'test.3@example.ne.jp';
 // URL
-// $regexp_url   = '/http[s]?://[a-z]*.[a-z]{2,3}[a-z/?.=]*/'; // URLの正規表現を入力
-$regexp_url   = '/^http[s]?:\/\/[a-z]*.[a-z]{2,3}[a-z\/?.=]*/'; // URLの正規表現を入力
+$regexp_url   = '/^http[s]?:\/\/[a-z]*.[a-z]{2,3}[a-z\/?.=]*$/'; // URLの正規表現を入力
 $check_url[0] = 'http://codecamp.jp';
 $check_url[1] = 'https://test.com';
 $check_url[2] = 'http://codecamp.jp/index.html?q=test';
