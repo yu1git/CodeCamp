@@ -1,6 +1,6 @@
 <?php
 // 西暦
-$regexp_year   = '/^[0-9]{4}$/'; // 西暦の正規表現を入力
+$regexp_year   = '/^[1-2][0-9]{3}$/'; // 西暦の正規表現を入力
 $check_year[0] = '1953';
 $check_year[1] = '2013';
 // 電話番号
@@ -8,8 +8,9 @@ $regexp_phone_number   = '/^[0-9]{2,4}-[0-9]{3,4}-[0-9]{3,4}$/'; // 電話番号
 $check_phone_number[0] = '03-1111-1111';
 $check_phone_number[1] = '040-222-2222';
 $check_phone_number[2] = '0120-000-000';
-// formタグ
-$regexp_form   = '/^<.+?>$/'; // formの正規表現を入力
+// formタグ ※要修正
+// $regexp_form   = '/^<.+?>$/'; formタグ以外も含まれてしまうので不正解
+$regexp_form   = '/^<form[a-z].+?>$/'; // formの正規表現を入力
 $check_form[0] = '<form>';
 $check_form[1] = '<form method="post">';
 // メールアドレス
@@ -18,7 +19,8 @@ $check_mail[0] = 'test@test.com';
 $check_mail[1] = 'test_2@test.co.jp';
 $check_mail[2] = 'test.3@example.ne.jp';
 // URL
-$regexp_url   = '/^http[s]?:\/\/[a-z]*.[a-z]{2,3}[a-z\/?.=]*$/'; // URLの正規表現を入力
+// $regexp_url   = '/^http[s]?:\/\/[a-z]*.[a-z]{2,3}[a-z\/?.=]*$/';  [s]にしないと?効かないと勘違いしていたが、[]は不要
+$regexp_url   = '/^https?:\/\/[a-z]*.[a-z]{2,3}[a-z\/?.=]*$/'; // URLの正規表現を入力
 $check_url[0] = 'http://codecamp.jp';
 $check_url[1] = 'https://test.com';
 $check_url[2] = 'http://codecamp.jp/index.html?q=test';
