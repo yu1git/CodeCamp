@@ -8,9 +8,8 @@ $regexp_phone_number   = '/^[0-9]{2,4}-[0-9]{3,4}-[0-9]{3,4}$/'; // 電話番号
 $check_phone_number[0] = '03-1111-1111';
 $check_phone_number[1] = '040-222-2222';
 $check_phone_number[2] = '0120-000-000';
-// formタグ ※要修正
-// $regexp_form   = '/^<.+?>$/'; formタグ以外も含まれてしまうので不正解
-$regexp_form   = '/^<form[a-z].+?>$/'; // formの正規表現を入力
+// formタグ
+$regexp_form   = '/^<form[a-z="\s]*?>$/'; // formの正規表現を入力
 $check_form[0] = '<form>';
 $check_form[1] = '<form method="post">';
 // メールアドレス
