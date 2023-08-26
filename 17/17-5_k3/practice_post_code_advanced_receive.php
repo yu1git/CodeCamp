@@ -52,9 +52,9 @@
     <h1>郵便番号検索</h1>
     <section>
         <h2>郵便番号から検索</h2>
-        <form>
+        <form method="post" action="practice_post_code_advanced.php">
             <input type="text" name="zipcode" placeholder="例）1010001" value="">
-            <input type="hidden" name="search_method" value="zipcode">
+            <!-- <input type="hidden" name="search_method" value="zipcode"> -->
             <input type="submit" value="検索">
         </form>
         <h2>地名から検索</h2>
