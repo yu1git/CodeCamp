@@ -10,12 +10,13 @@
 + 検索結果が10件を超えた場合、表示結果を複数ページに分ける。 ※「前へ」「次へ」のようなリンクによりページ切り替えができる
 
 ▼調べる
-formが２つ必要→区別の仕方は？
+formが２つ必要→区別の仕方は？→済
     https://teratail.com/questions/318167 
         <input type="hidden" name="search_method" value="zipcode">のvalueで判別する
 
-入力の前後にある全角及び半角スペースを削除？
+入力の前後にある全角及び半角スペースを削除？→済　確認未
     07/7-8_k2/practice_global_receive_elementary.php　と同じで問題ない？
 
 ページ切り替え？
+    https://お役立ち.xyz/php/pagination-switching/7187/
 
