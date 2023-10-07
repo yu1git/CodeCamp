@@ -2,8 +2,7 @@
 <html lang="ja">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+    <meta charset="UTF-8">
     <title>郵便番号検索</title>
     <style>
         .search_reslut {
@@ -53,12 +52,14 @@
     <section>
         <h2>郵便番号から検索</h2>
         <form method="post" action="practice_post_code_advanced.php">
-            <input type="text" name="zipcode" placeholder="例）1010001" value="">
+        <!-- <form method="post" action=""> -->
+            <input type="text" name="zipcode" placeholder="例）0600000" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
         </form>
         <h2>地名から検索</h2>
-        <form>
+        <form method="post" action="practice_post_code_advanced.php">
+        <!-- <form method="post" action=""> -->
             都道府県を選択
             <select name="pref">
                 <option value="" selected="">都道府県を選択</option>
@@ -118,6 +119,37 @@
     </section>
     <section class="search_reslut">
         <p>ここに検索結果が表示されます</p>
+
+        <table>
+        <tr>
+            <th>郵便番号</th>
+            <th>都道府県</th>
+            <th>住所1</th>
+            <th>住所2</th>
+        </tr>
+<?php
+foreach ($result_table as $value) {
+?>
+
+        <tr>
+            <td><?php print htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td><?php print htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td><?php print htmlspecialchars($value['address1'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td><?php print htmlspecialchars($value['address2'], ENT_QUOTES, 'UTF-8'); ?></td>
+         </tr>
+<?php
+}
+?>
+    </table>
+
+
+
+        <!-- ページ切り替え -->
+        <!-- ▼MAMP -->
+        <!-- <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
+        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a> -->
+        <!-- ▼XAMPP -->
+        
     </section>
 </body>
 
