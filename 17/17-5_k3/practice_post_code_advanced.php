@@ -1,12 +1,13 @@
 <?php
+// エラーを表示
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+
 // 初期化
 $zipcode = '';
 $pref = '';
 $address = '';
 $result_list = [];
-
-// データ総数
-$count = 0;
 
 $zipcode_error_messages = '';
 $pref_address_error_messages = '';
@@ -24,13 +25,13 @@ $passwd   = 'root';
 $dbname   = 'codecamp';
 
 $link = mysqli_connect($host, $username, $passwd, $dbname);
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if ( $_POST['search_method'] === 'zipcode' ){
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $search_method = $_POST['search_method'];
+    
+    if ($search_method === 'zipcode') {
         if ( isset( $_POST['zipcode'] ) === TRUE ) {
             $zipcode = $_POST['zipcode'];
-            // 入力の前後にある全角及び半角スペースを削除
-            // 全角スペースを半角に変換（trimでは全角スペースを削除しないため）
             $zipcode = mb_convert_kana($zipcode, "s", 'UTF-8');
             $zipcode = trim($zipcode);
         }
@@ -45,75 +46,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $zipcode_error_messages = '郵便番号は7桁の数値で入力してください';
         }
 
-        if (empty($zipcode_error_messages) && $link) {
-            // 文字化け防止
-            mysqli_set_charset($link, 'utf8');
-    
-            $query = 'SELECT * FROM zip_data_split_1 WHERE zipcode = \'' . $zipcode . '\'';
-    
-            // クエリを実行します
-            $result = mysqli_query($link, $query);
-            // 1行ずつ結果を配列で取得します
-            while ($row = mysqli_fetch_array($result)) {
-                $result_list[] = $row;
-            }
-            // 結果セットを開放します ※SELECTでデータを取得したときのみ、メモリの開放が必要
-            mysqli_free_result($result);
+        if (empty($zipcode_error_messages)) {            
+            if ($link) {
+                mysqli_set_charset($link, 'utf8');
+                $query = "SELECT * FROM zip_data_split_1 WHERE zipcode = ?";
+                $stmt = mysqli_prepare($link, $query);
+                mysqli_stmt_bind_param($stmt, 's', $zipcode);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
 
-            var_dump($result_list);
-        // 接続失敗した場合
-        } else {
-            print 'DB接続失敗';
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $result_list[] = $row;
+                }
+
+                mysqli_free_result($result);
+                mysqli_stmt_close($stmt);
+                mysqli_close($link);
+            } else {
+                echo 'DB接続失敗';
+            }
         }
     }
     
-    if ( $_POST['search_method'] === 'address' ){
+    if ($search_method === 'address') {
         if ( isset( $_POST['pref'] ) === TRUE ) {
             $pref = $_POST['pref'];
-            // 入力の前後にある全角及び半角スペースを削除
-            // 全角スペースを半角に変換（trimでは全角スペースを削除しないため）
             $pref = mb_convert_kana($pref, "s", 'UTF-8');
             $pref = trim($pref);
         }
         if ( isset( $_POST['address'] ) === TRUE ) {
             $address = $_POST['address'];
-            // 入力の前後にある全角及び半角スペースを削除
-            // 全角スペースを半角に変換（trimでは全角スペースを削除しないため）
             $address = mb_convert_kana($address, "s", 'UTF-8');
             $address = trim($address);
         }
 
-        // バリデーションチェック
-        if (empty($pref) or empty($address)) {
-            $pref_address_error_messages = '都道府県と市区町村は必ず両方入力してください';
+        if (empty($pref) || empty($address)) {
+            $pref_address_error_messages = '都道府県と市区町村は必ず入力してください';
         }
 
-        if (empty($pref_address_error_messages) && $link) {
-            // 文字化け防止
-            mysqli_set_charset($link, 'utf8');
-    
-            $query = 'SELECT * FROM zip_data_split_1 WHERE pref = \'' . $pref . '\' AND address1 = \'' . $address . '\'';
-    
-            // クエリを実行します
-            $result = mysqli_query($link, $query);
-            // 1行ずつ結果を配列で取得します
-            while ($row = mysqli_fetch_array($result)) {
-                $result_list[] = $row;
+        if (empty($pref_address_error_messages)) {
+            if ($link) {
+                mysqli_set_charset($link, 'utf8');
+                $query = "SELECT * FROM zip_data_split_1 WHERE pref = ? AND address1 = ?";
+                $stmt = mysqli_prepare($link, $query);
+                mysqli_stmt_bind_param($stmt, 'ss', $pref, $address);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $result_list[] = $row;
+                }
+
+                mysqli_free_result($result);
+                mysqli_stmt_close($stmt);
+                mysqli_close($link);
+            } else {
+                echo 'DB接続失敗';
             }
-            // 結果セットを開放します ※SELECTでデータを取得したときのみ、メモリの開放が必要
-            mysqli_free_result($result);
-            var_dump($result_list);
-        // 接続失敗した場合
-        } else {
-            print 'DB接続失敗';
         }
     }
-
-    
-    
 }
-// 接続を閉じます
-mysqli_close($link);
 
 return $result_list;
 ?>

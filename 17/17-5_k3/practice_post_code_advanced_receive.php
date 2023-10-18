@@ -1,6 +1,12 @@
+<?php
+// エラーを表示
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+
+$result_list = include('practice_post_code_advanced.php');
+?>
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <title>郵便番号検索</title>
@@ -37,29 +43,19 @@
 </head>
 
 <body>
-    <section class="blackbox-overlay">
-
-        <div data-current="Tab 1" data-easing="ease" data-duration-in="300" data-duration-out="100"
-            class="tabs-2 w-tabs">
-            <div class="confirmation-modal">
-                <div class="small-close on-confirmation-modal w-inline-block">
-                    <img src="./郵便番号検索_files/6489f7e3cd2fb16b87351cac_Close.svg" loading="lazy" alt="" class="image-37">
-                </div>
-            </div>
-        </div>
-    </section>
     <h1>郵便番号検索</h1>
     <section>
         <h2>郵便番号から検索</h2>
-        <form method="post" action="practice_post_code_advanced.php">
-        <!-- <form method="post" action=""> -->
+        <!-- <form method="post" action="practice_post_code_advanced.php"> -->
+        <!-- ▼質問　　actionには何を書けばいいのか？　　上記では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
+        <form method="post" action="">
+        <!-- <form method="post" action="practice_post_code_advanced_receive.php"> -->
             <input type="text" name="zipcode" placeholder="例）0600000" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
         </form>
         <h2>地名から検索</h2>
-        <form method="post" action="practice_post_code_advanced.php">
-        <!-- <form method="post" action=""> -->
+        <form method="post" action="practice_post_code_advanced_receive.php">
             都道府県を選択
             <select name="pref">
                 <option value="" selected="">都道府県を選択</option>
@@ -119,30 +115,28 @@
     </section>
     <section class="search_reslut">
         <p>ここに検索結果が表示されます</p>
-
         <table>
-        <tr>
-            <th>郵便番号</th>
-            <th>都道府県</th>
-            <th>住所1</th>
-            <th>住所2</th>
-        </tr>
-<?php
-foreach ($result_table as $value) {
-?>
-
-        <tr>
-            <td><?php print htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8'); ?></td>
-            <td><?php print htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8'); ?></td>
-            <td><?php print htmlspecialchars($value['address1'], ENT_QUOTES, 'UTF-8'); ?></td>
-            <td><?php print htmlspecialchars($value['address2'], ENT_QUOTES, 'UTF-8'); ?></td>
-         </tr>
-<?php
-}
-?>
-    </table>
-
-
+            <tr>
+                <th>郵便番号</th>
+                <th>都道府県</th>
+                <th>住所1</th>
+                <th>住所2</th>
+            </tr>
+            <?php
+            if (!empty($result_list)) {
+                foreach ($result_list as $value) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8') . '</td>';
+                    echo '<td>' . htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8') . '</td>';
+                    echo '<td>' . htmlspecialchars($value['address1'], ENT_QUOTES, 'UTF-8') . '</td>';
+                    echo '<td>' . htmlspecialchars($value['address2'], ENT_QUOTES, 'UTF-8') . '</td>';
+                    echo '</tr>';
+                }
+            } else {
+                echo "検索結果がありません。";
+            }
+            ?>
+        </table>
 
         <!-- ページ切り替え -->
         <!-- ▼MAMP -->
@@ -152,5 +146,4 @@ foreach ($result_table as $value) {
         
     </section>
 </body>
-
 </html>
