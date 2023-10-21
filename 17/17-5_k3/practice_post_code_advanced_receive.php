@@ -50,10 +50,15 @@ $result_list = include('practice_post_code_advanced.php');
         <!-- ▼質問　　actionには何を書けばいいのか？　　上記では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
         <form method="post" action="">
         <!-- <form method="post" action="practice_post_code_advanced_receive.php"> -->
-            <input type="text" name="zipcode" placeholder="例）0600000" value="">
+            <input type="text" name="zipcode" placeholder="例）0600001" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
         </form>
+        <?php 
+            if(!empty($zipcode_error_messages)) {
+                echo '<p style="color:red">' . $zipcode_error_messages . '</p>';
+            }
+        ?>
         <h2>地名から検索</h2>
         <form method="post" action="practice_post_code_advanced_receive.php">
             都道府県を選択
@@ -108,10 +113,15 @@ $result_list = include('practice_post_code_advanced.php');
                 <option value="沖縄県">沖縄県</option>
             </select>
             市区町村
-            <input type="text" name="address" value="">
+            <input type="text" name="address" placeholder="札幌市中央区" value="">
             <input type="hidden" name="search_method" value="address">
             <input type="submit" value="検索">
         </form>
+        <?php 
+            if(!empty($pref_address_error_messages)) {
+                echo '<p style="color:red">' . $pref_address_error_messages . '</p>';
+            }
+        ?>
     </section>
     <section class="search_reslut">
         <p>ここに検索結果が表示されます</p>
@@ -140,9 +150,11 @@ $result_list = include('practice_post_code_advanced.php');
 
         <!-- ページ切り替え -->
         <!-- ▼MAMP -->
-        <!-- <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
-        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a> -->
+        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
+        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a>
         <!-- ▼XAMPP -->
+        <!-- <a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
+        <a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a> -->
         
     </section>
 </body>
