@@ -1,9 +1,125 @@
 <?php
 // エラーを表示
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$result_list = include('practice_post_code_advanced.php');
+// 初期化
+$zipcode = '';
+$pref = '';
+$address = '';
+$result_list = [];
+$search_method = '';
+
+$zipcode_error_messages = '';
+$pref_address_error_messages = '';
+
+// XAMPP
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = '';
+// $dbname   = 'codecamp';
+
+// MAMP
+$host = 'localhost';
+$username = 'root';
+$passwd   = 'root';
+$dbname   = 'codecamp';
+
+$link = mysqli_connect($host, $username, $passwd, $dbname);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $search_method = $_POST['search_method'];
+    
+    if ($search_method === 'zipcode') {
+        if ( isset( $_POST['zipcode'] ) === TRUE ) {
+            $zipcode = $_POST['zipcode'];
+            $zipcode = mb_convert_kana($zipcode, "s", 'UTF-8');
+            $zipcode = trim($zipcode);
+        }
+
+        // 郵便番号は7桁の数値のみ検索可能
+        $regexp_zipcode = '/^[0-9]{7}$/';
+
+        // バリデーションチェック
+        if (empty($zipcode)) {
+            $zipcode_error_messages = '郵便番号は必ず入力してください';
+        } else if (!preg_match($regexp_zipcode, $zipcode)) {
+            $zipcode_error_messages = '郵便番号は7桁の数値で入力してください';
+        }
+
+        if (empty($zipcode_error_messages)) {            
+            if ($link) {
+                mysqli_set_charset($link, 'utf8');
+                $query = "SELECT * FROM zip_data_split_1 WHERE zipcode = ?";
+                $stmt = mysqli_prepare($link, $query);
+                mysqli_stmt_bind_param($stmt, 's', $zipcode);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                $result_list = [];
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $result_list[] = $row;
+                }
+
+                mysqli_free_result($result);
+                mysqli_stmt_close($stmt);
+                mysqli_close($link);
+            } else {
+                echo 'DB接続失敗';
+            }
+        }
+    }
+    
+    if ($search_method === 'address') {
+        if ( isset( $_POST['pref'] ) === TRUE ) {
+            $pref = $_POST['pref'];
+            $pref = mb_convert_kana($pref, "s", 'UTF-8');
+            $pref = trim($pref);
+        }
+        if ( isset( $_POST['address'] ) === TRUE ) {
+            $address = $_POST['address'];
+            $address = mb_convert_kana($address, "s", 'UTF-8');
+            $address = trim($address);
+        }
+
+        if (empty($pref) || empty($address)) {
+            $pref_address_error_messages = '都道府県と市区町村は必ず入力してください';
+        }
+
+        if (empty($pref_address_error_messages)) {
+            if ($link) {
+                mysqli_set_charset($link, 'utf8');
+                $query = "SELECT * FROM zip_data_split_1 WHERE pref = ? AND address1 = ?";
+                $stmt = mysqli_prepare($link, $query);
+                mysqli_stmt_bind_param($stmt, 'ss', $pref, $address);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+
+                $result_list = [];
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $result_list[] = $row;
+                }
+
+                mysqli_free_result($result);
+                mysqli_stmt_close($stmt);
+                mysqli_close($link);
+            } else {
+                echo 'DB接続失敗';
+            }
+        }
+    }
+}
+
+// ページングに関する変数
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; // 現在のページ番号
+$itemsPerPage = 10; // 1ページに表示するアイテム数
+$totalResults = count($result_list); // 結果の総数
+$offset = ($page - 1) * $itemsPerPage; // 結果の取得を開始する位置
+
+// 結果リストからページに該当するアイテムを取得
+$paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -133,8 +249,8 @@ $result_list = include('practice_post_code_advanced.php');
                 <th>住所2</th>
             </tr>
             <?php
-            if (!empty($result_list)) {
-                foreach ($result_list as $value) {
+            if (!empty($paginatedResults)) {
+                foreach ($paginatedResults as $value) {
                     echo '<tr>';
                     echo '<td>' . htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8') . '</td>';
                     echo '<td>' . htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8') . '</td>';
@@ -149,13 +265,22 @@ $result_list = include('practice_post_code_advanced.php');
         </table>
 
         <!-- ページ切り替え -->
-        <!-- ▼MAMP -->
-        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
-        <a href="http://localhost:8888/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a>
-        <!-- ▼XAMPP -->
-        <!-- <a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page-1); ?>">前のページへ</a>
-        <a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=<?php print($page+1); ?>">次のページへ</a> -->
-        
+        <?php
+        if (count($result_list) > $itemsPerPage) {
+            if ($page > 1) {
+                // ▼MAMP
+                echo '<a href="practice_post_code_advanced_receive.php?page=' . ($page-1) . '">前のページへ</a>';
+                // ▼XAMPP
+                // echo '<a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=' . ($page-1) . '">前のページへ</a>';
+            }
+            if (count($result_list) > ($offset + $itemsPerPage)) {
+                // ▼MAMP
+                echo '<a href="practice_post_code_advanced_receive.php?page=' . ($page+1) . '">次のページへ</a>';
+                // ▼XAMPP
+                // echo '<a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=' . ($page+1) . '">次のページへ</a>';
+            }
+        } 
+        ?>
     </section>
 </body>
 </html>

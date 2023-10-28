@@ -12,6 +12,8 @@ $result_list = [];
 $zipcode_error_messages = '';
 $pref_address_error_messages = '';
 
+
+
 // XAMPP
 // $host = 'localhost';
 // $username = 'root';
