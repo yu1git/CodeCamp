@@ -55,8 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_bind_param($stmt, 's', $zipcode);
                 mysqli_stmt_execute($stmt);
                 $result = mysqli_stmt_get_result($stmt);
-                $result_list = [];
-
                 while ($row = mysqli_fetch_assoc($result)) {
                     $result_list[] = $row;
                 }
@@ -94,9 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_bind_param($stmt, 'ss', $pref, $address);
                 mysqli_stmt_execute($stmt);
                 $result = mysqli_stmt_get_result($stmt);
-
-                $result_list = [];
-
                 while ($row = mysqli_fetch_assoc($result)) {
                     $result_list[] = $row;
                 }
@@ -115,12 +110,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; // 現在のページ番号
 $itemsPerPage = 10; // 1ページに表示するアイテム数
 $totalResults = count($result_list); // 結果の総数
+$max_page = ceil($totalResults / $itemsPerPage);
 $offset = ($page - 1) * $itemsPerPage; // 結果の取得を開始する位置
 
 // 結果リストからページに該当するアイテムを取得
-$paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
-
+// $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
+$paginatedResults = [];
+for($i = 0; $i <= $max_page; $i++) {
+    $paginatedResults[$i] = array_slice($result_list, $i * $itemsPerPage, $itemsPerPage);
+}
 ?>
+<!-- <pre>
+    <?php var_dump($paginatedResults); ?>
+</pre> -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -163,9 +165,8 @@ $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
     <section>
         <h2>郵便番号から検索</h2>
         <!-- <form method="post" action="practice_post_code_advanced.php"> -->
-        <!-- ▼質問　　actionには何を書けばいいのか？　　上記では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
+        <!-- ▼質問　　actionには何を書けばいいのか？　　上記のように本ファイルと別のファイル名では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
         <form method="post" action="">
-        <!-- <form method="post" action="practice_post_code_advanced_receive.php"> -->
             <input type="text" name="zipcode" placeholder="例）0600001" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
@@ -176,7 +177,7 @@ $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
             }
         ?>
         <h2>地名から検索</h2>
-        <form method="post" action="practice_post_code_advanced_receive.php">
+        <form method="post" action="practice_post_code_advanced.php">
             都道府県を選択
             <select name="pref">
                 <option value="" selected="">都道府県を選択</option>
@@ -249,8 +250,8 @@ $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
                 <th>住所2</th>
             </tr>
             <?php
-            if (!empty($paginatedResults)) {
-                foreach ($paginatedResults as $value) {
+            if (!empty($paginatedResults[$page - 1])) {
+                foreach ($paginatedResults[$page - 1] as $value) {
                     echo '<tr>';
                     echo '<td>' . htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8') . '</td>';
                     echo '<td>' . htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8') . '</td>';
@@ -269,15 +270,15 @@ $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
         if (count($result_list) > $itemsPerPage) {
             if ($page > 1) {
                 // ▼MAMP
-                echo '<a href="practice_post_code_advanced_receive.php?page=' . ($page-1) . '">前のページへ</a>';
+                echo '<a href="practice_post_code_advanced.php?page=' . ($page-1) . '">前へ</a>';
                 // ▼XAMPP
-                // echo '<a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=' . ($page-1) . '">前のページへ</a>';
+                // echo '<a href="practice_post_code_advanced.php?page=' . ($page-1) . '">前へ</a>';
             }
-            if (count($result_list) > ($offset + $itemsPerPage)) {
+            if ($page < $max_page) {
                 // ▼MAMP
-                echo '<a href="practice_post_code_advanced_receive.php?page=' . ($page+1) . '">次のページへ</a>';
+                echo '<a href="practice_post_code_advanced.php?page=' . ($page+1) . '">次へ</a>';
                 // ▼XAMPP
-                // echo '<a href="http://localhost/CodeCamp/17/17-5_k3/practice_post_code_advanced_receive.php?page=' . ($page+1) . '">次のページへ</a>';
+                // echo '<a href="practice_post_code_advanced.php?page=' . ($page+1) . '">次へ</a>';
             }
         } 
         ?>
