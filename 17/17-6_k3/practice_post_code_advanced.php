@@ -14,25 +14,25 @@ $zipcode_error_messages = '';
 $pref_address_error_messages = '';
 
 // XAMPP
-// $host = 'localhost';
-// $username = 'root';
-// $passwd   = '';
-// $dbname   = 'codecamp';
-
-// MAMP
 $host = 'localhost';
 $username = 'root';
-$passwd   = 'root';
+$passwd   = '';
 $dbname   = 'codecamp';
+
+// MAMP
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = 'root';
+// $dbname   = 'codecamp';
 
 $link = mysqli_connect($host, $username, $passwd, $dbname);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $search_method = $_POST['search_method'];
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $search_method = $_GET['search_method'];
     
     if ($search_method === 'zipcode') {
-        if ( isset( $_POST['zipcode'] ) === TRUE ) {
-            $zipcode = $_POST['zipcode'];
+        if ( isset( $_GET['zipcode'] ) === TRUE ) {
+            $zipcode = $_GET['zipcode'];
             $zipcode = mb_convert_kana($zipcode, "s", 'UTF-8');
             $zipcode = trim($zipcode);
         }
@@ -69,13 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if ($search_method === 'address') {
-        if ( isset( $_POST['pref'] ) === TRUE ) {
-            $pref = $_POST['pref'];
+        if ( isset( $_GET['pref'] ) === TRUE ) {
+            $pref = $_GET['pref'];
             $pref = mb_convert_kana($pref, "s", 'UTF-8');
             $pref = trim($pref);
         }
-        if ( isset( $_POST['address'] ) === TRUE ) {
-            $address = $_POST['address'];
+        if ( isset( $_GET['address'] ) === TRUE ) {
+            $address = $_GET['address'];
             $address = mb_convert_kana($address, "s", 'UTF-8');
             $address = trim($address);
         }
@@ -166,7 +166,8 @@ for($i = 0; $i <= $max_page; $i++) {
         <h2>郵便番号から検索</h2>
         <!-- <form method="post" action="practice_post_code_advanced.php"> -->
         <!-- ▼質問　　actionには何を書けばいいのか？　　上記のように本ファイルと別のファイル名では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
-        <form method="post" action="">
+        <!-- action：該当するformを送信する先。URL先のパスが合っているか -->
+        <form method="get" action="">
             <input type="text" name="zipcode" placeholder="例）0600001" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
@@ -177,7 +178,7 @@ for($i = 0; $i <= $max_page; $i++) {
             }
         ?>
         <h2>地名から検索</h2>
-        <form method="post" action="practice_post_code_advanced.php">
+        <form method="get" action="practice_post_code_advanced.php">
             都道府県を選択
             <select name="pref">
                 <option value="" selected="">都道府県を選択</option>
@@ -270,15 +271,15 @@ for($i = 0; $i <= $max_page; $i++) {
         if (count($result_list) > $itemsPerPage) {
             if ($page > 1) {
                 // ▼MAMP
-                echo '<a href="practice_post_code_advanced.php?page=' . ($page-1) . '">前へ</a>';
+                // echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
                 // ▼XAMPP
-                // echo '<a href="practice_post_code_advanced.php?page=' . ($page-1) . '">前へ</a>';
+                echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
             }
             if ($page < $max_page) {
                 // ▼MAMP
-                echo '<a href="practice_post_code_advanced.php?page=' . ($page+1) . '">次へ</a>';
+                // echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
                 // ▼XAMPP
-                // echo '<a href="practice_post_code_advanced.php?page=' . ($page+1) . '">次へ</a>';
+                echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
             }
         } 
         ?>
