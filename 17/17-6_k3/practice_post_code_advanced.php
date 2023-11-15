@@ -14,115 +14,117 @@ $zipcode_error_messages = '';
 $pref_address_error_messages = '';
 
 // XAMPP
-$host = 'localhost';
-$username = 'root';
-$passwd   = '';
-$dbname   = 'codecamp';
-
-// MAMP
 // $host = 'localhost';
 // $username = 'root';
-// $passwd   = 'root';
+// $passwd   = '';
 // $dbname   = 'codecamp';
 
+// MAMP
+$host = 'localhost';
+$username = 'root';
+$passwd   = 'root';
+$dbname   = 'codecamp';
+
 $link = mysqli_connect($host, $username, $passwd, $dbname);
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $search_method = $_GET['search_method'];
-    
-    if ($search_method === 'zipcode') {
-        if ( isset( $_GET['zipcode'] ) === TRUE ) {
-            $zipcode = $_GET['zipcode'];
-            $zipcode = mb_convert_kana($zipcode, "s", 'UTF-8');
-            $zipcode = trim($zipcode);
-        }
-
-        // 郵便番号は7桁の数値のみ検索可能
-        $regexp_zipcode = '/^[0-9]{7}$/';
-
-        // バリデーションチェック
-        if (empty($zipcode)) {
-            $zipcode_error_messages = '郵便番号は必ず入力してください';
-        } else if (!preg_match($regexp_zipcode, $zipcode)) {
-            $zipcode_error_messages = '郵便番号は7桁の数値で入力してください';
-        }
-
-        if (empty($zipcode_error_messages)) {            
-            if ($link) {
-                mysqli_set_charset($link, 'utf8');
-                $query = "SELECT * FROM zip_data_split_1 WHERE zipcode = ?";
-                $stmt = mysqli_prepare($link, $query);
-                mysqli_stmt_bind_param($stmt, 's', $zipcode);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $result_list[] = $row;
-                }
-
-                mysqli_free_result($result);
-                mysqli_stmt_close($stmt);
-                mysqli_close($link);
-            } else {
-                echo 'DB接続失敗';
-            }
-        }
-    }
-    
-    if ($search_method === 'address') {
-        if ( isset( $_GET['pref'] ) === TRUE ) {
-            $pref = $_GET['pref'];
-            $pref = mb_convert_kana($pref, "s", 'UTF-8');
-            $pref = trim($pref);
-        }
-        if ( isset( $_GET['address'] ) === TRUE ) {
-            $address = $_GET['address'];
-            $address = mb_convert_kana($address, "s", 'UTF-8');
-            $address = trim($address);
-        }
-
-        if (empty($pref) || empty($address)) {
-            $pref_address_error_messages = '都道府県と市区町村は必ず入力してください';
-        }
-
-        if (empty($pref_address_error_messages)) {
-            if ($link) {
-                mysqli_set_charset($link, 'utf8');
-                $query = "SELECT * FROM zip_data_split_1 WHERE pref = ? AND address1 = ?";
-                $stmt = mysqli_prepare($link, $query);
-                mysqli_stmt_bind_param($stmt, 'ss', $pref, $address);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $result_list[] = $row;
-                }
-
-                mysqli_free_result($result);
-                mysqli_stmt_close($stmt);
-                mysqli_close($link);
-            } else {
-                echo 'DB接続失敗';
-            }
-        }
-    }
-}
 
 // ページングに関する変数
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; // 現在のページ番号
 $itemsPerPage = 10; // 1ページに表示するアイテム数
-$totalResults = count($result_list); // 結果の総数
-$max_page = ceil($totalResults / $itemsPerPage);
 $offset = ($page - 1) * $itemsPerPage; // 結果の取得を開始する位置
 
-// 結果リストからページに該当するアイテムを取得
-// $paginatedResults = array_slice($result_list, $offset, $itemsPerPage);
-$paginatedResults = [];
-for($i = 0; $i <= $max_page; $i++) {
-    $paginatedResults[$i] = array_slice($result_list, $i * $itemsPerPage, $itemsPerPage);
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (isset($_GET['search_method'])) {
+        $search_method = $_GET['search_method'];
+        
+        if ($search_method === 'zipcode') {
+            if ( isset( $_GET['zipcode'] ) === TRUE ) {
+                $zipcode = $_GET['zipcode'];
+                $zipcode = mb_convert_kana($zipcode, "s", 'UTF-8');
+                $zipcode = trim($zipcode);
+            }
+
+            // 郵便番号は7桁の数値のみ検索可能
+            $regexp_zipcode = '/^[0-9]{7}$/';
+
+            // バリデーションチェック
+            if (empty($zipcode)) {
+                $zipcode_error_messages = '郵便番号は必ず入力してください';
+            } else if (!preg_match($regexp_zipcode, $zipcode)) {
+                $zipcode_error_messages = '郵便番号は7桁の数値で入力してください';
+            }
+
+            if (empty($zipcode_error_messages)) {            
+                if ($link) {
+                    mysqli_set_charset($link, 'utf8');
+                    $query = "SELECT * FROM zip_data_split_1 WHERE zipcode = ? LIMIT ?, ?";
+                    $stmt = mysqli_prepare($link, $query);
+                    // sii：バインドするパラメータの型を表す文字列。sは文字列、iは整数
+                    mysqli_stmt_bind_param($stmt, 'sii', $zipcode, $offset, $itemsPerPage);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    if ($result !== false) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $result_list[] = $row;
+                        }
+
+                        mysqli_free_result($result);
+                    } else {
+                        // エラー処理
+                        echo 'SELECT ステートメントが失敗しました。';
+                    }
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($link);
+                } else {
+                    echo 'DB接続失敗';
+                }
+            }
+        }
+        
+        if ($search_method === 'address') {
+            if ( isset( $_GET['pref'] ) === TRUE ) {
+                $pref = $_GET['pref'];
+                $pref = mb_convert_kana($pref, "s", 'UTF-8');
+                $pref = trim($pref);
+            }
+            if ( isset( $_GET['address'] ) === TRUE ) {
+                $address = $_GET['address'];
+                $address = mb_convert_kana($address, "s", 'UTF-8');
+                $address = trim($address);
+            }
+
+            if (empty($pref) || empty($address)) {
+                $pref_address_error_messages = '都道府県と市区町村は必ず入力してください';
+            }
+
+            if (empty($pref_address_error_messages)) {
+                if ($link) {
+                    mysqli_set_charset($link, 'utf8');
+                    $query = "SELECT * FROM zip_data_split_1 WHERE pref = ? AND address1 = ? LIMIT ?, ?";
+                    $stmt = mysqli_prepare($link, $query);
+                    mysqli_stmt_bind_param($stmt, 'ssii', $pref, $address, $offset, $itemsPerPage);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    if ($result !== false) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $result_list[] = $row;
+                        }
+
+                        mysqli_free_result($result);
+                    } else {
+                        // エラー処理
+                        echo 'SELECT ステートメントが失敗しました。';
+                    }
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($link);
+                } else {
+                    echo 'DB接続失敗';
+                }
+            }
+        }
+    }
+
 }
 ?>
-<!-- <pre>
-    <?php var_dump($paginatedResults); ?>
-</pre> -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -168,7 +170,7 @@ for($i = 0; $i <= $max_page; $i++) {
         <!-- ▼質問　　actionには何を書けばいいのか？　　上記のように本ファイルと別のファイル名では正常に動かなかった。　業務：コントローラーのメソッドを書いてる -->
         <!-- action：該当するformを送信する先。URL先のパスが合っているか -->
         <form method="get" action="">
-            <input type="text" name="zipcode" placeholder="例）0600001" value="">
+            <input type="text" name="zipcode" placeholder="0600001" value="">
             <input type="hidden" name="search_method" value="zipcode">
             <input type="submit" value="検索">
         </form>
@@ -250,9 +252,10 @@ for($i = 0; $i <= $max_page; $i++) {
                 <th>住所1</th>
                 <th>住所2</th>
             </tr>
+            
             <?php
-            if (!empty($paginatedResults[$page - 1])) {
-                foreach ($paginatedResults[$page - 1] as $value) {
+            if (!empty($result_list)) {
+                foreach ($result_list as $value) {
                     echo '<tr>';
                     echo '<td>' . htmlspecialchars($value['zipcode'], ENT_QUOTES, 'UTF-8') . '</td>';
                     echo '<td>' . htmlspecialchars($value['pref'], ENT_QUOTES, 'UTF-8') . '</td>';
@@ -268,20 +271,18 @@ for($i = 0; $i <= $max_page; $i++) {
 
         <!-- ページ切り替え -->
         <?php
-        if (count($result_list) > $itemsPerPage) {
-            if ($page > 1) {
-                // ▼MAMP
-                // echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
-                // ▼XAMPP
-                echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
-            }
-            if ($page < $max_page) {
-                // ▼MAMP
-                // echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
-                // ▼XAMPP
-                echo '<a href="practice_post_code_advanced.php?pref=' . ($pref) . '&address=' . ($address) . '&search_method' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
-            }
-        } 
+        if ($page > 1) {
+            // ▼MAMP
+            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
+            // ▼XAMPP
+            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
+        }
+        if (count($result_list) == $itemsPerPage) {
+            // ▼MAMP
+            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
+            // ▼XAMPP
+            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
+        }
         ?>
     </section>
 </body>
