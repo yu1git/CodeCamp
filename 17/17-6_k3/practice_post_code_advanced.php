@@ -1,12 +1,13 @@
 <?php
 // エラーを表示
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 // 初期化
 $zipcode = '';
 $pref = '';
 $address = '';
+$result_count = 0;
 $result_list = [];
 $search_method = '';
 
@@ -14,16 +15,16 @@ $zipcode_error_messages = '';
 $pref_address_error_messages = '';
 
 // XAMPP
-$host = 'localhost';
-$username = 'root';
-$passwd   = '';
-$dbname   = 'codecamp';
-
-// MAMP
 // $host = 'localhost';
 // $username = 'root';
-// $passwd   = 'root';
+// $passwd   = '';
 // $dbname   = 'codecamp';
+
+// MAMP
+$host = 'localhost';
+$username = 'root';
+$passwd   = 'root';
+$dbname   = 'codecamp';
 
 $link = mysqli_connect($host, $username, $passwd, $dbname);
 
@@ -56,6 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (empty($zipcode_error_messages)) {            
                 if ($link) {
                     mysqli_set_charset($link, 'utf8');
+                    $query_count = "SELECT COUNT(*) AS count FROM zip_data_split_1 WHERE zipcode = ?";
+                    $stmt = mysqli_prepare($link, $query_count);
+                    // sii：バインドするパラメータの型を表す文字列。sは文字列、iは整数
+                    mysqli_stmt_bind_param($stmt, 's', $zipcode);
+                    mysqli_stmt_execute($stmt);
+                    $result_count = mysqli_stmt_get_result($stmt);
+                    if ($result_count !== false) {
+                        while ($row = mysqli_fetch_assoc($result_count)) {
+                            $result_count = $row;
+                        }
+
+                        mysqli_free_result($result_count);
+                    } else {
+                        // エラー処理
+                        echo 'SELECT ステートメントが失敗しました。';
+                    }
+
                     $query = "SELECT * FROM zip_data_split_1 WHERE zipcode = ? LIMIT ?, ?";
                     $stmt = mysqli_prepare($link, $query);
                     // sii：バインドするパラメータの型を表す文字列。sは文字列、iは整数
@@ -99,6 +117,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (empty($pref_address_error_messages)) {
                 if ($link) {
                     mysqli_set_charset($link, 'utf8');
+                    $query_count = "SELECT COUNT(*) AS count FROM zip_data_split_1 WHERE pref = ? AND address1 = ?";
+                    $stmt = mysqli_prepare($link, $query_count);
+                    // sii：バインドするパラメータの型を表す文字列。sは文字列、iは整数
+                    mysqli_stmt_bind_param($stmt, 'ss', $pref, $address);
+                    mysqli_stmt_execute($stmt);
+                    $result_count = mysqli_stmt_get_result($stmt);
+                    if ($result_count !== false) {
+                        while ($row = mysqli_fetch_assoc($result_count)) {
+                            $result_count = $row;
+                        }
+
+                        mysqli_free_result($result_count);
+                    } else {
+                        // エラー処理
+                        echo 'SELECT ステートメントが失敗しました。';
+                    }
+
                     $query = "SELECT * FROM zip_data_split_1 WHERE pref = ? AND address1 = ? LIMIT ?, ?";
                     $stmt = mysqli_prepare($link, $query);
                     mysqli_stmt_bind_param($stmt, 'ssii', $pref, $address, $offset, $itemsPerPage);
@@ -244,8 +279,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         ?>
     </section>
     <section class="search_reslut">
-        <p>ここに検索結果が表示されます</p>
-        <!-- TODO検索結果の件数を表示 -->
+        <?php 
+        if (!empty($result_count)) {
+            echo '<p>検索結果' . $result_count['count'] . '件</p>';        
+        } else {
+            echo '<p>ここに検索結果が表示されます</p>';
+        }
+        ?>
         <table>
             <tr>
                 <th>郵便番号</th>
@@ -274,15 +314,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         <?php
         if ($page > 1) {
             // ▼MAMP
-            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
-            // ▼XAMPP
             echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
+            // ▼XAMPP
+            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
         }
         if (count($result_list) == $itemsPerPage) {
             // ▼MAMP
-            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
-            // ▼XAMPP
             echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
+            // ▼XAMPP
+            // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
         }
         ?>
     </section>
