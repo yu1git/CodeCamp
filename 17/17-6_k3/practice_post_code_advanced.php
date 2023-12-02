@@ -14,16 +14,16 @@ $zipcode_error_messages = '';
 $pref_address_error_messages = '';
 
 // XAMPP
-// $host = 'localhost';
-// $username = 'root';
-// $passwd   = '';
-// $dbname   = 'codecamp';
-
-// MAMP
 $host = 'localhost';
 $username = 'root';
-$passwd   = 'root';
+$passwd   = '';
 $dbname   = 'codecamp';
+
+// MAMP
+// $host = 'localhost';
+// $username = 'root';
+// $passwd   = 'root';
+// $dbname   = 'codecamp';
 
 $link = mysqli_connect($host, $username, $passwd, $dbname);
 
@@ -245,6 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     </section>
     <section class="search_reslut">
         <p>ここに検索結果が表示されます</p>
+        <!-- TODO検索結果の件数を表示 -->
         <table>
             <tr>
                 <th>郵便番号</th>
@@ -273,15 +274,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         <?php
         if ($page > 1) {
             // ▼MAMP
-            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
-            // ▼XAMPP
             // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
+            // ▼XAMPP
+            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page-1) . '">前へ</a>';
         }
         if (count($result_list) == $itemsPerPage) {
             // ▼MAMP
-            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
-            // ▼XAMPP
             // echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
+            // ▼XAMPP
+            echo '<a href="?pref=' . ($pref) . '&address=' . ($address) . '&search_method=' . ($search_method) . '&page=' . ($page+1) . '">次へ</a>';
         }
         ?>
     </section>

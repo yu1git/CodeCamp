@@ -12,6 +12,7 @@ JOIN customer_table ON order_table.customer_id = customer_table.customer_id
 JOIN order_detail_table ON order_table.order_id = order_detail_table.order_id
 JOIN goods_table ON order_detail_table.goods_id = goods_table.goods_id
 WHERE customer_table.customer_id = 1;
+-- 基本的にはidで検索
 
 -- 3.コーラの売上情報を取得
 SELECT goods_table.goods_name, goods_table.price, order_detail_table.quantity, order_table.order_date
